@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.board.service.impl.BoardMapper">
+
+	<resultMap id="board" type="egovframework.example.board.service.BoardVO">
+		<result property="idx" column="idx"/>
+		<result property="title" column="title"/>
+		<result property="contents" column="contents"/>
+		<result property="writer" column="writer"/>
+		<result property="writerNm" column="writerNm"/>
+		<result property="indate" column="indate"/>
+	</resultMap>
+
+	<insert id="insertBoard" parameterType="boardVO">
+<!-- 			insertBoard -->
+			INSERT INTO TB_BOARD
+				(   IDX
+				  , TITLE
+				  , CONTENTS
+				  , COUNT
+				  , WRITER
+				  , INDATE )
+			VALUES 
+			      ( NULL
+			      , #{title, jdbcType=VARCHAR}
+				  , #{contents, jdbcType=VARCHAR}
+				  , 0
+				  , #{writer, jdbcType=VARCHAR}
+				  , SYSDATE() )
+	</insert>
+
+	<update id="updateBoard">
+
+			UPDATE TB_BOARD
+			SET   TITLE=#{title, jdbcType=VARCHAR}
+				, CONTENTS=#{contents, jdbcType=VARCHAR}
+			WHERE IDX=#{idx}
+
+	</update>
+
+	<delete id="deleteBoard">
+
+			DELETE FROM TB_BOARD
+			WHERE IDX=#{idx}
+
+	</delete>
+
+	<select id="selectBoard" resultMap="board">
+
+			SELECT
+			        A.IDX as idx
+				  , A.TITLE as title
+				  , A.CONTENTS as contents
+				  , A.COUNT as count
+				  , A.WRITER as writer
+				  , A.INDATE as indate
+				  , B.USER_NAME	 as writerNm
+			FROM TB_BOARD A INNER JOIN TB_USER B 
+			                  ON A.WRITER = B.USER_ID
+			WHERE IDX=#{idx}
+
+	</select>
+
+	<select id="selectBoardList" parameterType="boardVO" resultType="egovMap">
+
+			SELECT
+			        A.IDX as idx
+				  , A.TITLE as title
+				  , A.CONTENTS as contents
+				  , A.COUNT as count
+				  , A.WRITER as writer
+				  , A.INDATE as indate
+				  , B.USER_NAME	 as writerNm
+			FROM TB_BOARD A INNER JOIN TB_USER B 
+			                  ON A.WRITER = B.USER_ID
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				AND	( A.TITLE LIKE CONCAT('%', #{searchKeyword},'%')
+				     OR A.CONTENTS LIKE CONCAT('%', #{searchKeyword},'%')
+   				    )
+			</if>
+			ORDER BY IDX DESC
+<!-- 			LIMIT #{recordCountPerPage} OFFSET #{firstIndex} -->
+	</select>
+
+	<select id="selectBoardListTotCnt" parameterType="boardVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM TB_BOARD A
+			WHERE 1=1
+			<if test="searchKeyword != null and searchKeyword != ''">
+				AND	( A.TITLE LIKE CONCAT('%', #{searchKeyword},'%')
+				     OR A.CONTENTS LIKE CONCAT('%', #{searchKeyword},'%')
+   				    )
+			</if>
+	</select>
+	
+	<select id="selectLoginCheck" parameterType="boardVO" resultType="String">
+
+			SELECT USER_NAME
+			FROM TB_USER
+			WHERE 1=1
+			AND USER_ID = #{user_id}
+			AND PASSWORD = #{password}
+	</select>
+
+	<insert id="insertReply" parameterType="boardVO">
+<!-- 			insertReply -->
+			INSERT INTO TB_REPLY
+				(   IDX
+				  , SEQ
+				  , REPLY
+				  , WRITER
+				  , INDATE )
+			VALUES 
+			      ( #{idx}
+			      , (SELECT IFNULL(MAX(X.SEQ)+1,1) FROM TB_REPLY X WHERE X.IDX = #{idx} )
+				  , #{reply, jdbcType=VARCHAR}
+				  , #{writer, jdbcType=VARCHAR}
+				  , SYSDATE() )
+	</insert>
+</mapper>
