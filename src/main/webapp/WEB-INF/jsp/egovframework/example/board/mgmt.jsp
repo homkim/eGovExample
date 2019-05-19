@@ -112,6 +112,13 @@ function list() {
 		    </div>
 		  </div>
 
+		  <div class="form-group">
+		    <label class="control-label col-sm-2" for="contents">첨부:</label>
+		    <div class="col-sm-10"> 
+		      <input type="file"  class="form-control"  id="file" name="file">
+		    </div>
+		  </div>
+
 		  
 		</form>
 
