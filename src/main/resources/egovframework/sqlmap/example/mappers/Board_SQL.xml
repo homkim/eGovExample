@@ -44,9 +44,17 @@
 			WHERE IDX=#{idx}
 
 	</delete>
+	
+	<update id="updateBoardCount">
+
+			UPDATE TB_BOARD
+			SET   COUNT = IFNULL(COUNT,0) + 1
+			WHERE IDX=#{idx}
+
+	</update>
 
 	<select id="selectBoard" resultMap="board">
-
+			/* selectBoard */
 			SELECT
 			        A.IDX as idx
 				  , A.TITLE as title
@@ -57,7 +65,7 @@
 				  , B.USER_NAME	 as writerNm
 			FROM TB_BOARD A INNER JOIN TB_USER B 
 			                  ON A.WRITER = B.USER_ID
-			WHERE IDX=#{idx}
+			WHERE IDX=#{idx, jdbcType=VARCHAR}
 
 	</select>
 
@@ -71,6 +79,7 @@
 				  , A.WRITER as writer
 				  , A.INDATE as indate
 				  , B.USER_NAME	 as writerNm
+				  , (SELECT COUNT(*) FROM TB_REPLY X WHERE X.IDX = A.IDX) AS reply
 			FROM TB_BOARD A INNER JOIN TB_USER B 
 			                  ON A.WRITER = B.USER_ID
 			WHERE 1=1
@@ -80,7 +89,7 @@
    				    )
 			</if>
 			ORDER BY IDX DESC
-<!-- 			LIMIT #{recordCountPerPage} OFFSET #{firstIndex} -->
+ 			LIMIT #{firstIndex}, #{recordCountPerPage}  
 	</select>
 
 	<select id="selectBoardListTotCnt" parameterType="boardVO" resultType="int">
@@ -119,4 +128,19 @@
 				  , #{writer, jdbcType=VARCHAR}
 				  , SYSDATE() )
 	</insert>
+
+	<select id="selectReplyList" parameterType="boardVO" resultType="egovMap">
+
+			SELECT
+			        A.IDX as idx
+				  , A.SEQ as seq
+				  , A.REPLY as reply
+				  , A.WRITER as writer
+				  , A.INDATE as indate
+			FROM TB_REPLY A
+			WHERE 1=1
+			AND	A.IDX = #{idx}
+			ORDER BY A.SEQ ASC
+	</select>
+	
 </mapper>

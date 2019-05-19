@@ -35,25 +35,26 @@ public class BoardController {
 	public String list(@ModelAttribute("boardVO") BoardVO boardVO, ModelMap model) throws Exception {
 	
 		/** EgovPropertyService.sample */
-//		boardVO.setPageUnit(propertiesService.getInt("pageUnit"));
-//		boardVO.setPageSize(propertiesService.getInt("pageSize"));
+		boardVO.setPageUnit(propertiesService.getInt("pageUnit"));
+		boardVO.setPageSize(propertiesService.getInt("pageSize"));
 
 		/** pageing setting */
-//		PaginationInfo paginationInfo = new PaginationInfo();
-//		paginationInfo.setCurrentPageNo(boardVO.getPageIndex());
-//		paginationInfo.setRecordCountPerPage(boardVO.getPageUnit());
-//		paginationInfo.setPageSize(boardVO.getPageSize());
-//
-//		boardVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
-//		boardVO.setLastIndex(paginationInfo.getLastRecordIndex());
-//		boardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-//
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(boardVO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(boardVO.getPageUnit());
+		paginationInfo.setPageSize(boardVO.getPageSize());
+
+		boardVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		boardVO.setLastIndex(paginationInfo.getLastRecordIndex());
+		boardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
 		List<?> list = boardService.selectBoardList(boardVO);
 		model.addAttribute("resultList", list);
 
 		int totCnt = boardService.selectBoardListTotCnt(boardVO);
-//		paginationInfo.setTotalRecordCount(totCnt);
-//		model.addAttribute("paginationInfo", paginationInfo);
+		
+		paginationInfo.setTotalRecordCount(totCnt);
+		model.addAttribute("paginationInfo", paginationInfo);
 		
 		return "board/list";
 	}
@@ -65,13 +66,12 @@ public class BoardController {
 		String strToday = sdf.format(c1.getTime());
 		System.out.println("Today="+ strToday);
 		
+		boardVO = boardService.selectBoard(boardVO);
+		
 		boardVO.setIndate(strToday);
 		boardVO.setWriter(request.getSession().getAttribute("userId").toString() );
 		boardVO.setWriterNm(request.getSession().getAttribute("userName").toString() );
 
-		if (boardVO.getIdx() != null && boardVO.getIdx() != "") {
-			boardVO = boardService.selectBoard(boardVO);
-		}
 		model.addAttribute("boardVO", boardVO);
 		
 		return "board/mgmt";
@@ -93,8 +93,12 @@ public class BoardController {
 	@RequestMapping(value = "/view.do")
 	public String view(@ModelAttribute("boardVO") BoardVO boardVO,ModelMap model, HttpServletRequest request) throws Exception {
 
+		boardService.updateBoardCount(boardVO);
 		boardVO = boardService.selectBoard(boardVO);
 		model.addAttribute("boardVO", boardVO);
+		
+		List<?> list = boardService.selectReplyList(boardVO);
+		model.addAttribute("resultList", list);
 		
 		return "board/view";
 	}
@@ -106,7 +110,7 @@ public class BoardController {
 		boardService.insertReply(boardVO);
 		model.addAttribute("boardVO", boardVO);
 		
-		return "redirect:/view.do";
+		return "redirect:/view.do?idx="+boardVO.getIdx() ;
 	}
 	
 	@RequestMapping(value = "/login.do")

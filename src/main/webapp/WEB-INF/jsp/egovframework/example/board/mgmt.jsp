@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<title>전자정부프레임워크 with MariaDB</title>
+<title>eGovFramework실습 with MariaDB</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width-device-width, initial-scale=1">
 <link rel="stylesheet" href="<c:url value='/css/bootstrap/css/bootstrap.min.css'/>">

@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<title>전자정부프레임워크 with MariaDB</title>
+<title>eGovFramework실습 with MariaDB</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width-device-width, initial-scale=1">
 <link rel="stylesheet" href="<c:url value='/css/bootstrap/css/bootstrap.min.css'/>">
@@ -29,6 +29,12 @@ function list() {
 }
 function add() {
 	
+	if ($("#writer").val() == '') {
+		alert("로그인을 먼저 하세요.")
+		$("#writer").focus();
+		return;
+	}
+	
 	if ($("#reply").val() == '') {
 		alert("댓글을 입력하세요.")
 		$("#reply").focus();
@@ -39,20 +45,29 @@ function add() {
 		return;
 	}
 	
-	document.form2.action="<c:url value='/reply.do'/>";
+	document.form2.action="<c:url value='/reply.do'/>?idx=${boardVO.idx}";
 	document.form2.submit();
 
 }
 function mod() {
 	
-	location.href="<c:url value='/mgmt.do'/>?idx=+${boardVO.idx}";
+	location.href="<c:url value='/mgmt.do'/>?idx=${boardVO.idx}";
 }
 function del() {
+	
+	var cnt = ${fn:length(resultList)};
+	if(cnt > 0) {
+		alert("댓글이 있는 게시물은 삭제가 안됩니다.");
+		return;
+	}
+		
+		
+	
 	if (!confirm("삭제하시겠습니까?")) {
 		return;
 	}
 	
-	document.form1.action="<c:url value='/mgmt.do'/>?idx=+${boardVO.idx}&mode=del";
+	document.form1.action="<c:url value='/mgmt.do'/>?idx=${boardVO.idx}&mode=del";
 	document.form1.submit();
 	
 }
@@ -116,7 +131,17 @@ function del() {
   
   </div>
 </div>
-<div class="well well-sm">작성자/댓글</div>
+
+
+<c:forEach var="result" items="${resultList}" varStatus="status">
+	<div class="well well-sm">
+		<c:out value="${result.writer}"/>/<c:out value="${result.indate}"/></br>
+<%-- 		<c:out value="${result.reply}"/> --%>
+		<c:out value="${fn:replace(result.reply, crcn, br)}" escapeXml="false"/>
+	</div>
+</c:forEach>
+
+
 <div class="well well-lg">
 		<form id="form2" name="form2" class="form-horizontal" method="post" action="">
 			<div class="form-group">

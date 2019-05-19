@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="c"      uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="form"   uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="ui"     uri="http://egovframework.gov/ctl/ui"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -7,7 +8,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<title>전자정부프레임워크 with MariaDB</title>
+<title>eGovFramework실습 with MariaDB</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width-device-width, initial-scale=1">
 <link rel="stylesheet" href="<c:url value='/css/bootstrap/css/bootstrap.min.css'/>">
@@ -57,6 +58,12 @@ function out() {
 	location.href="<c:url value='/logout.do'/>";
 }
 
+/* pagination 페이지 링크 function */
+function page(pageNo){
+	location.href="<c:url value='/list.do'/>?pageIndex=" + pageNo;
+}
+
+
 </script>
 </head>
 <body>
@@ -100,11 +107,14 @@ function out() {
 
 
 	<form class="form-inline" method="post" action="<c:url value='/list.do'/>">
+	<div align="right">
 	  <div class="form-group">
 	    <label for="searchKeyword">제목/내용:</label>
 	    <input type="text" class="form-control" id="searchKeyword" name="searchKeyword">
 	  </div>
 	  <button type="submit" class="btn btn-default">검색</button>
+	</div>
+	TOTAL : ${paginationInfo.totalRecordCount} 건
 	</form>  
 
 
@@ -115,6 +125,7 @@ function out() {
 		        <th>No.</th>
 		        <th>Title</th>
 		        <th>Hit</th>
+		        <th>Reply</th>
 		        <th>Created By</th>
 		        <th>Created On</th>
 		      </tr>
@@ -123,20 +134,30 @@ function out() {
 		    	<c:forEach var="result" items="${resultList}" varStatus="status">
 		    
 			      <tr>
-			        <td><a href="javascript:view(${result.idx});"><c:out value="${result.idx}"/>&nbsp;</td>
-			        <td><a href="javascript:view(${result.idx});"><c:out value="${result.title}"/>&nbsp;</a></td>
-			        <td><c:out value="${result.count}"/>&nbsp;</td>
-			        <td><c:out value="${result.writerNm}"/>&nbsp;</td>
-			        <td><c:out value="${result.indate}"/>&nbsp;</td>
+			        <td><a href="javascript:view(${result.idx});"><c:out value="${result.idx}"/></td>
+			        <td><a href="javascript:view(${result.idx});"><c:out value="${result.title}"/></a></td>
+			        <td><c:out value="${result.count}"/></td>
+			        <td><c:out value="${result.reply}"/></td>
+			        <td><c:out value="${result.writerNm}"/></td>
+<%-- 	            <td><c:out value="${result.indate}"/></td> --%>
+					<td><fmt:formatDate value="${result.indate}" pattern="yyyy-MM-dd hh:mm:ss"/></td>
 			      </tr>
 
 				</c:forEach>
 
 
-
 		    </tbody>
 	  </table>
 	</div>
+
+   	<!-- /List -->
+   	<div id="paging" align="center">
+   		<ul class="pagination">
+   			<ui:pagination paginationInfo = "${paginationInfo}" type="image" jsFunction="page" />
+<%--    		<form:hidden path="pageIndex" /> --%>
+		</ul>
+   	</div>
+
 
 
   </div>

@@ -65,6 +65,8 @@ public interface BoardService {
 	 * @return 조회한 글
 	 * @exception Exception
 	 */
+	void updateBoardCount(BoardVO vo) throws Exception;
+	
 	BoardVO selectBoard(BoardVO vo) throws Exception;
 
 	/**
@@ -85,5 +87,8 @@ public interface BoardService {
 	String selectLoginCheck(BoardVO boardVO);
 	
 	void insertReply(BoardVO vo) throws Exception;
+	
+	List<?> selectReplyList(BoardVO boardVO) throws Exception;
+	
 
 }

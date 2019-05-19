@@ -109,10 +109,14 @@ public class BoardServiceImpl extends EgovAbstractServiceImpl implements BoardSe
 	 * @return 조회한 글
 	 * @exception Exception
 	 */
+	public void updateBoardCount(BoardVO vo) throws Exception {
+		boardDAO.updateBoardCount(vo);
+	}
 	public BoardVO selectBoard(BoardVO vo) throws Exception {
 		BoardVO resultVO = boardDAO.selectBoard(vo);
 		if (resultVO == null)
-			throw processException("info.nodata.msg");
+			//throw processException("info.nodata.msg");
+			resultVO = new BoardVO();
 		return resultVO;
 	}
 
@@ -146,5 +150,7 @@ public class BoardServiceImpl extends EgovAbstractServiceImpl implements BoardSe
 		boardDAO.insertReply(vo);
 	}
 
-	
+	public List<?> selectReplyList(BoardVO boardVO) throws Exception {
+		return boardDAO.selectReplyList(boardVO);
+	}	
 }
